@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# Allow traversal into subdirectories
+!*/
+
+# Only track solver files and gitignore
+!.gitignore
+!solver*.py
+
+# Never track credentials
+.env
+!.env.example
+
+!README.MD
