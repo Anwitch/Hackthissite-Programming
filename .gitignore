@@ -4,6 +4,10 @@
 # Allow traversal into subdirectories
 !*/
 
+# Never track these folders
+7/
+8/
+
 # Only track solver files and gitignore
 !.gitignore
 !solver*.py
