@@ -5,6 +5,7 @@
 !*/
 
 # Never track these folders
+6/
 8/
 
 # Only track solver files and gitignore
