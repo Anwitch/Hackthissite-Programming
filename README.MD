@@ -2,7 +2,7 @@
 
 Kumpulan solver otomatis untuk [HackThisSite Programming Challenges](https://www.hackthissite.org/missions/prog/).
 
-> **Disclaimer:** Level 7 dan Level 8 **belum berhasil diselesaikan**. Script yang ada di folder `7/` dan `8/` masih dalam tahap pengembangan dan belum menghasilkan jawaban yang diterima. Namun script tersebut bisa dijadikan **referensi pendekatan** untuk menyelesaikan kedua level tersebut.
+> **Disclaimer:** Level 7 dan Level 8 **belum berhasil diselesaikan**. Script yang ada di folder `7/` Belum selesai. Namun script tersebut bisa dijadikan **referensi pendekatan** untuk menyelesaikan kedua level tersebut.
 
 ---
 
@@ -43,7 +43,6 @@ Semua solver membaca kredensial dari file `.env` ini secara otomatis.
 ├── 4/              # Level 4  — bz2 XML Plot Visualization
 ├── 5/              # Level 5  — Corrupted bz2 PNG Recovery
 ├── 7/              # Level 7  — Scrambled Image Lines (BELUM SELESAI)
-├── 8/              # Level 8  — IRC Bot Challenge (BELUM SELESAI)
 ├── 9/              # Level 9  — Sudoku + Blowfish Decryption
 ├── 10/             # Level 10 — Steganography + Hash Brute-force
 ├── 11/             # Level 11 — Shift Cipher Decoder
@@ -117,20 +116,6 @@ python 5/solver5.py
 **File:** `7/solver7.py`  
 **Status:** Belum berhasil diterima oleh server.  
 **Deskripsi:** Gambar berisi 2 baris teks yang baris-barisnya telah diacak (pay-TV style scrambling). Setiap baris dikodekan dengan nilai R (red channel) yang berbeda, dan terdiri dari 6 kelompok kolom. Pendekatan yang dicoba: analisis fitur struktural + Tesseract OCR. Bisa dijadikan referensi untuk pengembangan lebih lanjut.
-
----
-
-### Level 8 — IRC Bot Challenge ⚠️ BELUM SELESAI
-**File:** `8/solver8.py`  
-**Status:** Belum berhasil diterima oleh server.  
-**Deskripsi:** Challenge ini membutuhkan bot IRC yang terhubung ke `irc.hackthissite.org`. Alur yang perlu diselesaikan:
-1. Connect ke IRC, identifikasi dengan NickServ
-2. Kirim `!perm8` ke bot `moo`
-3. Bot membalas dengan tantangan MD5 → jawab dengan hash yang benar
-4. Balas CTCP VERSION (bukan sebagai mIRC)
-5. Bergabung ke `#takeoverz` dan kick `moo`
-
-Script yang ada bisa dijadikan referensi implementasi IRC dengan Python.
 
 ---
 
