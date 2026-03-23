@@ -12,9 +12,9 @@
 !.gitignore
 !solver*.py
 !solver*.rb
+!word*.txt
+!README.MD
 
 # Never track credentials
 .env
 !.env.example
-
-!README.MD
