@@ -2,7 +2,9 @@
 
 Kumpulan solver otomatis untuk [HackThisSite Programming Challenges](https://www.hackthissite.org/missions/prog/).
 
-> **Disclaimer:** Level 7 dan Level 8 **belum berhasil diselesaikan**. Script yang ada di folder `7/` Belum selesai. Namun script tersebut bisa dijadikan **referensi pendekatan** untuk menyelesaikan kedua level tersebut.
+Repository ini dibuat oleh Andrie Wijaya (Mahasiswa Informatika, Universitas Tanjungpura) saat Semester 6 untuk mata kuliah Keamanan Informasi dan Jaringan.
+
+> **Disclaimer:** Level 7 **belum berhasil diselesaikan**. Skrip di folder `7/` belum selesai, namun tetap bisa dijadikan **referensi pendekatan** untuk pengembangan lebih lanjut.
 
 ---
 
@@ -60,9 +62,13 @@ Semua solver membaca kredensial dari file `.env` ini secara otomatis.
 **Bahasa:** Ruby  
 **Deskripsi:** Diberikan daftar kata yang huruf-hurufnya diacak. Solver membaca `wordlist.txt` sebagai kamus, mengurutkan karakter tiap kata sebagai kunci, lalu mencocokan kata-kata acak dari `words.txt`.  
 **Cara pakai:**
+Copy wordlist dari challenge ke dalam file `wordlist.txt`.
+Copy scrambled word dari challenge ke dalam file `words.txt`.
+Jalankan
 ```bash
 ruby 1/unscrambled.rb
 ```
+Dan Copy jawabannya dari terminal.
 
 ---
 
@@ -70,9 +76,12 @@ ruby 1/unscrambled.rb
 **File:** `2/Prog2.py`  
 **Deskripsi:** Diberikan gambar yang berisi kode Morse. Solver membaca gambar, mengekstrak pola titik/garis dari piksel, lalu mendekode ke teks menggunakan tabel kode Morse.  
 **Cara pakai:**
+Download challenge image dari challenge dan masukkan ke dalam folder 2.
+Jalankan
 ```bash
 python 2/Prog2.py
 ```
+Dan jawabannya akan muncul di terminal/siap paste.
 
 ---
 
