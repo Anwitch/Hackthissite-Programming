@@ -37,7 +37,35 @@ PASSWORD = os.getenv("HTS_PASSWORD")
 URL_LOGIN = "https://www.hackthissite.org/user/login"
 URL_PROG5 = "https://www.hackthissite.org/missions/prog/5/"
 URL_SUBMIT = "https://www.hackthissite.org/missions/prog/5/index.php"
-HEADERS = {"Referer": "https://www.hackthissite.org/"}
+DEFAULT_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/123.0.0.0 Safari/537.36"
+)
+HEADERS = {
+    "User-Agent": DEFAULT_UA,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9,id;q=0.8",
+    "Referer": "https://www.hackthissite.org/",
+}
+
+
+def _looks_logged_in(html: str) -> bool:
+    h = (html or "").lower()
+    # HTS pages usually include a logout link when authenticated.
+    return ("logout" in h) or ("/?logout" in h) or ("hello," in h)
+
+
+def _looks_login_error(html: str) -> bool:
+    h = (html or "").lower()
+    return any(k in h for k in ["invalid", "incorrect", "wrong password", "login failed"])
+
+
+def _save_debug_html(filename: str, html: str) -> str:
+    out = os.path.join(os.path.dirname(__file__), filename)
+    with open(out, "w", encoding="utf-8") as f:
+        f.write(html or "")
+    return out
 
 
 # ─── Reconstruction Algorithm (from programming5.py) ──────────
@@ -109,38 +137,63 @@ def reconstruct_bz2(data):
 def solve():
     session = requests.Session()
 
+    if not USERNAME or not PASSWORD:
+        print("ERROR: HTS_USERNAME/HTS_PASSWORD tidak ditemukan.")
+        print("       Isi file .env di folder Programming (lihat .env.example).")
+        session.close()
+        return
+
     # 1. Login
-    resp = session.post(URL_LOGIN,
-                        data={"username": USERNAME, "password": PASSWORD},
-                        headers=HEADERS)
-    print(f"[1] Login: {resp.status_code}")
+    # Some sites set cookies on GET before POSTing credentials.
+    session.get(URL_LOGIN, headers=HEADERS)
+    resp = session.post(
+        URL_LOGIN,
+        data={"username": USERNAME, "password": PASSWORD},
+        headers=HEADERS,
+        allow_redirects=True,
+    )
+    print(f"[1] Login: {resp.status_code} ({resp.url})")
+    if _looks_login_error(resp.text) or (resp.url.rstrip("/") == URL_LOGIN.rstrip("/") and not _looks_logged_in(resp.text)):
+        print("WARNING: Login mungkin gagal (status 200 tapi masih di halaman login).")
+        print("         Cek username/password di .env atau apakah HTS butuh verifikasi tambahan.")
 
     # 2. Get challenge page & find download link
     page = session.get(URL_PROG5, headers=HEADERS)
-    print(f"[2] Challenge page: {page.status_code}")
+    print(f"[2] Challenge page: {page.status_code} ({page.url})")
 
     link = re.search(r'href="([^"]*\.bz2[^"]*)"', page.text)
     if not link:
         print("ERROR: No .bz2 link found on page!")
-        print(page.text[:2000])
-        session.close()
-        return
+        debug_path = _save_debug_html("prog5_debug.html", page.text)
+        print(f"       Saved HTML for inspection: {debug_path}")
 
-    file_url = link.group(1)
-    if file_url.startswith('/'):
-        file_url = "https://www.hackthissite.org" + file_url
-    print(f"[3] Download: {file_url}")
+        # Fallback: known direct URL (historically used by HTS)
+        file_url = "https://www.hackthissite.org/missions/prog/5/corrupted.png.bz2"
+        print(f"[3] Fallback download: {file_url}")
+        resp = session.get(file_url, headers={**HEADERS, "Referer": URL_PROG5})
+        corrupted = resp.content
+        print(f"[4] Downloaded: {resp.status_code}, {len(corrupted)} bytes")
+        if not corrupted or corrupted[:3] != b"BZh":
+            print("ERROR: Fallback download tidak menghasilkan file bz2 yang valid.")
+            print("       Kemungkinan belum login / kena redirect / halaman berubah.")
+            session.close()
+            return
+    else:
+        file_url = link.group(1)
+        if file_url.startswith('/'):
+            file_url = "https://www.hackthissite.org" + file_url
+        print(f"[3] Download: {file_url}")
 
-    # 3. Download corrupted file
-    resp = session.get(file_url, headers=HEADERS)
-    corrupted = resp.content
-    crlf_count = corrupted.count(b'\r\n')
-    print(f"[4] Downloaded: {len(corrupted)} bytes, CRLF count: {crlf_count}")
+        # 3. Download corrupted file
+        resp = session.get(file_url, headers=HEADERS)
+        corrupted = resp.content
+        crlf_count = corrupted.count(b'\r\n')
+        print(f"[4] Downloaded: {len(corrupted)} bytes, CRLF count: {crlf_count}")
 
-    if not corrupted or corrupted[:3] != b'BZh':
-        print(f"ERROR: Unexpected file header: {corrupted[:10].hex()}")
-        session.close()
-        return
+        if not corrupted or corrupted[:3] != b'BZh':
+            print(f"ERROR: Unexpected file header: {corrupted[:10].hex()}")
+            session.close()
+            return
 
     # 4. Reconstruct and decompress
     print("[5] Reconstructing bz2 ...")
